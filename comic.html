@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="こくものまいにち — some cloudsの短編漫画。">
+  <title>おはなし | こくものまいにち</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <script src="./js/main.js" defer></script>
+</head>
+<body data-page="comic">
+  <a class="skip-link" href="#main">おはなしへ</a>
+  <header class="reader-header"><a href="./index.html">こくものまいにち</a></header>
+  <main id="main" class="reader" tabindex="-1">
+    <p id="page-status" class="page-status" role="status">おはなしを読み込んでいます。</p>
+    <article id="comic" hidden>
+      <header class="comic-heading">
+        <p id="comic-number" class="comic-number"></p>
+        <h1 id="comic-title"></h1>
+      </header>
+      <div id="comic-image" class="comic-image"></div>
+      <nav class="story-nav" aria-label="おはなしの移動">
+        <div id="previous-story"></div>
+        <div id="next-story"></div>
+      </nav>
+    </article>
+    <noscript><p class="page-status">作品を表示するには、ブラウザのJavaScriptを有効にしてください。</p></noscript>
+    <p class="back-link"><a href="./index.html">作品一覧へ戻る</a></p>
+  </main>
+  <footer class="site-footer"><a href="https://sakurak02.github.io/some-clouds/">some cloudsへ</a></footer>
+</body>
+</html>
