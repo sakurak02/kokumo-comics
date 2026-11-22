@@ -19,13 +19,18 @@
         <h1 id="comic-title"></h1>
       </header>
       <div id="comic-image" class="comic-image"></div>
+      <nav class="page-nav" aria-label="このおはなしのページ">
+        <button id="previous-page" type="button" aria-controls="comic-image">前のページ</button>
+        <p id="page-counter" role="status" aria-atomic="true"></p>
+        <button id="next-page" type="button" aria-controls="comic-image">次のページ</button>
+      </nav>
       <nav class="story-nav" aria-label="おはなしの移動">
         <div id="previous-story"></div>
         <div id="next-story"></div>
       </nav>
     </article>
     <noscript><p class="page-status">作品を表示するには、ブラウザのJavaScriptを有効にしてください。</p></noscript>
-    <p class="back-link"><a href="./index.html">作品一覧へ戻る</a></p>
+    <p class="back-link"><a href="./index.html">おはなし一覧にもどる</a></p>
   </main>
   <footer class="site-footer"><a href="https://sakurak02.github.io/some-clouds/">some cloudsへ</a></footer>
 </body>

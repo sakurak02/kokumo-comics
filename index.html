@@ -19,6 +19,12 @@
     <h2 class="section-title">おはなし一覧</h2>
     <p id="page-status" class="page-status" role="status">おはなしを読み込んでいます。</p>
     <ul id="comic-list" class="comic-list"></ul>
+    <details id="past-stories" class="past-stories" hidden>
+      <summary>過去のおはなし</summary>
+      <ul id="past-comic-list" class="comic-list"></ul>
+      <button id="load-more" class="load-more" type="button" aria-controls="past-comic-list">もっと見る</button>
+      <p id="past-status" class="visually-hidden" role="status"></p>
+    </details>
     <noscript><p class="page-status">作品を表示するには、ブラウザのJavaScriptを有効にしてください。</p></noscript>
   </main>
   <footer class="site-footer"><a href="https://sakurak02.github.io/some-clouds/">some cloudsへ</a></footer>

@@ -68,8 +68,7 @@ function createImage(comic, path, thumbnail = false, pageIndex = 0) {
   return wrapper;
 }
 
-function renderArchive(comics) {
-  const list = document.getElementById("comic-list");
+function appendCards(list, comics) {
   for (const comic of comics) {
     const item = document.createElement("li");
     const link = document.createElement("a");
@@ -88,6 +87,33 @@ function renderArchive(comics) {
     item.append(link);
     list.append(item);
   }
+}
+
+function renderArchive(comics) {
+  const batchSize = 8;
+  appendCards(document.getElementById("comic-list"), comics.slice(0, batchSize));
+  const past = document.getElementById("past-stories");
+  const pastList = document.getElementById("past-comic-list");
+  const more = document.getElementById("load-more");
+  let shown = batchSize;
+
+  function showMore(moveFocus = false) {
+    const batch = comics.slice(shown, shown + batchSize);
+    const firstNewIndex = pastList.children.length;
+    appendCards(pastList, batch);
+    shown += batch.length;
+    more.hidden = shown >= comics.length;
+    if (moveFocus) {
+      document.getElementById("past-status").textContent = `${batch.length}作品を追加しました。全${comics.length}作品中${shown}作品を表示しています。`;
+      pastList.children[firstNewIndex]?.querySelector("a").focus();
+    }
+  }
+
+  past.hidden = comics.length <= batchSize;
+  past.addEventListener("toggle", () => {
+    if (past.open && pastList.children.length === 0) showMore();
+  });
+  more.addEventListener("click", () => showMore(true));
   setStatus(comics.length ? "" : "おはなしは、ただいま準備中です。");
 }
 
@@ -118,11 +144,33 @@ function renderComic(comics) {
   document.getElementById("comic-number").textContent = comic.number;
   document.getElementById("comic-title").textContent = comic.title;
   const images = document.getElementById("comic-image");
-  comic.images.forEach((path, pageIndex) => {
-    const page = createImage(comic, path, false, pageIndex);
+  const previousPage = document.getElementById("previous-page");
+  const nextPage = document.getElementById("next-page");
+  const counter = document.getElementById("page-counter");
+  let pageIndex = 0;
+
+  function showPage() {
+    const page = createImage(comic, comic.images[pageIndex], false, pageIndex);
     page.className = "comic-page";
-    images.append(page);
-  });
+    images.replaceChildren(page);
+    counter.textContent = `${pageIndex + 1} / ${comic.images.length} ページ`;
+    previousPage.disabled = pageIndex === 0;
+    nextPage.disabled = pageIndex === comic.images.length - 1;
+  }
+
+  function turnPage(direction) {
+    const nextIndex = pageIndex + direction;
+    if (nextIndex < 0 || nextIndex >= comic.images.length) return;
+    pageIndex = nextIndex;
+    showPage();
+    // Start the new page at its top when the reader has scrolled down.
+    if (images.getBoundingClientRect().top < 0) images.scrollIntoView({ block: "start" });
+  }
+
+  previousPage.hidden = nextPage.hidden = comic.images.length === 1;
+  previousPage.addEventListener("click", () => turnPage(-1));
+  nextPage.addEventListener("click", () => turnPage(1));
+  showPage();
   // Newest first: previous is older; next is newer.
   neighbor("previous-story", comics[index + 1], "前のおはなし", "prev");
   neighbor("next-story", comics[index - 1], "次のおはなし", "next");
