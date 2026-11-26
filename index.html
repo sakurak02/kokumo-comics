@@ -16,7 +16,11 @@
     <p class="tagline">おかしくて、ほろり。</p>
   </header>
   <main id="main" class="archive" tabindex="-1">
-    <h2 class="section-title">おはなし一覧</h2>
+    <nav class="collection-switch" aria-label="コーナーの切り替え">
+      <a href="./index.html" data-section="stories" aria-current="page">おはなし</a>
+      <a href="./index.html?section=memories" data-section="memories">思い出</a>
+    </nav>
+    <h2 id="archive-title" class="section-title">おはなし一覧</h2>
     <p id="page-status" class="page-status" role="status">おはなしを読み込んでいます。</p>
     <ul id="comic-list" class="comic-list"></ul>
     <details id="past-stories" class="past-stories" hidden>

@@ -29,15 +29,16 @@ button:disabled { color: var(--muted); opacity: .55; cursor: default; }
 .site-header h1 { margin: 0; font: 500 clamp(1.65rem, 4.5vw, 2.5rem)/1.7 var(--serif); letter-spacing: .14em; }
 .tagline { margin: 18px 0 0; font-size: .9375rem; letter-spacing: .12em; }
 .archive { width: min(960px, calc(100% - 64px)); margin: 0 auto; flex: 1; }
+.collection-switch { display: flex; justify-content: center; gap: 36px; margin: 0 0 40px; }
+.collection-switch a { padding: 8px 4px; color: var(--muted); text-decoration: none; border-bottom: 1px solid transparent; }
+.collection-switch a[aria-current="page"] { color: var(--ink); border-color: var(--ink); }
 .section-title { margin: 0 0 28px; padding-bottom: 16px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: .875rem; font-weight: 400; letter-spacing: .12em; }
 .comic-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px 24px; margin: 0; padding: 0; list-style: none; }
 .past-stories { margin-top: 48px; border-top: 1px solid var(--line); }
 .past-stories summary { padding: 20px 0; font-size: .9375rem; cursor: pointer; }
 .past-stories .comic-list { margin-top: 8px; }
 .load-more { display: block; margin: 32px auto 0; padding: 10px 28px; font-size: .875rem; }
-.comic-card { display: block; text-decoration: none; }
-.thumbnail { position: relative; aspect-ratio: 4 / 3; display: grid; place-items: center; overflow: hidden; border: 1px solid var(--line); background: #fcfcfb; }
-.thumbnail img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; background: #fff; }
+.comic-card { display: block; padding: 8px 0; text-decoration: none; }
 .image-status { padding: 24px 16px; margin: 0; color: var(--muted); font-size: .875rem; letter-spacing: .06em; text-align: center; }
 .card-number { display: block; margin: 12px 0 3px; }
 .comic-number, .card-number { font-family: Georgia, serif; font-size: .875rem; font-weight: 400; color: var(--muted); letter-spacing: .12em; }
@@ -49,6 +50,7 @@ button:disabled { color: var(--muted); opacity: .55; cursor: default; }
 .reader-header a { text-decoration: none; }
 .reader-header a:hover { text-decoration: underline; }
 .reader { width: min(720px, calc(100% - 48px)); margin: 0 auto; flex: 1; }
+body[data-section="memories"] .reader { width: min(960px, calc(100% - 48px)); }
 .comic-heading { padding: 36px 0 48px; text-align: center; }
 .comic-number { margin: 0 0 12px; }
 .comic-heading h1 { margin: 0; font: 500 clamp(1.25rem, 4.8vw, 1.65rem)/1.8 var(--serif); letter-spacing: .08em; overflow-wrap: anywhere; }
@@ -76,6 +78,7 @@ button:disabled { color: var(--muted); opacity: .55; cursor: default; }
   .archive { width: calc(100% - 40px); }
   .comic-list { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .reader { width: calc(100% - 32px); }
+  body[data-section="memories"] .reader { width: calc(100% - 32px); }
   .comic-heading { padding: 24px 0 32px; }
   .comic-image .image-status { min-height: 280px; }
   .site-footer { padding-top: 64px; }
