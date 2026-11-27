@@ -33,20 +33,20 @@ class BuildTests(unittest.TestCase):
 
     def test_numeric_story_order_including_over_one_hundred(self):
         for number in range(1, 106):
-            self.image(f"comics/{number:03}/{number:03}_おはなし.webp")
+            self.image(f"comics/{number:03}_おはなし.webp")
         records = self.stories()
         self.assertEqual(len(records), 105)
         self.assertEqual([r["number"] for r in records], [f"{n:03}" for n in range(105, 0, -1)])
         self.assertNotIn("date", records[0])
 
-    def test_pages_sort_numerically_and_share_one_record(self):
+    def test_memory_pages_sort_numerically_and_share_one_record(self):
         for page in reversed(range(1, 11)):
-            prefix = "001" if page == 1 else f"001-{page}"
-            self.image(f"comics/001/{prefix}_おはなし.webp")
-        records = self.stories()
+            prefix = "20261125" if page == 1 else f"20261125-{page}"
+            self.image(f"memories/{prefix}_思い出.webp")
+        records = self.memories()
         self.assertEqual(len(records), 1)
-        self.assertEqual(records[0]["images"][1], "comics/001/001-2_おはなし.webp")
-        self.assertEqual(records[0]["images"][-1], "comics/001/001-10_おはなし.webp")
+        self.assertEqual(records[0]["images"][1], "memories/20261125-2_思い出.webp")
+        self.assertEqual(records[0]["images"][-1], "memories/20261125-10_思い出.webp")
 
     def test_memory_event_dates_and_same_day_entries(self):
         for name in ("20261125_空", "20261123_雲", "20261125_散歩"):
@@ -67,7 +67,7 @@ class BuildTests(unittest.TestCase):
             self.memories()
 
     def test_wrong_name_and_extension_are_rejected(self):
-        for filename in ("001.webp", "001-1.webp", "001_タイトル.png", "000_タイトル.webp", "001_ タイトル.webp"):
+        for filename in ("001.webp", "001-1.webp", "001_タイトル.png", "000_タイトル.webp", "001_ タイトル.webp", "001-1_タイトル.webp", "001-2_タイトル.webp"):
             with self.subTest(filename=filename):
                 path = self.image("comics/" + filename)
                 with self.assertRaises(builder.BuildError):
@@ -76,15 +76,20 @@ class BuildTests(unittest.TestCase):
 
     def test_duplicate_story_number_with_different_title(self):
         self.image("comics/001_空.webp")
-        self.image("comics/nested/001_雲.webp")
+        self.image("comics/001_雲.webp")
         with self.assertRaisesRegex(builder.BuildError, "作品番号001.*重複"):
             self.stories()
 
-    def test_duplicate_page_even_in_different_folders(self):
-        self.image("comics/001_空.webp")
-        self.image("comics/nested/001-1_空.webp")
-        with self.assertRaisesRegex(builder.BuildError, "1ページ目が重複"):
+    def test_story_subfolders_are_rejected_instead_of_silently_ignored(self):
+        self.image("comics/001/001_空.webp")
+        with self.assertRaisesRegex(builder.BuildError, "comics直下"):
             self.stories()
+
+    def test_duplicate_memory_page_even_in_different_folders(self):
+        self.image("memories/20261125_空.webp")
+        self.image("memories/nested/20261125-1_空.webp")
+        with self.assertRaisesRegex(builder.BuildError, "1ページ目が重複"):
+            self.memories()
 
     def test_unicode_equivalent_names_cannot_duplicate_an_entry(self):
         self.image("memories/a/20261125_が.webp")
@@ -93,23 +98,25 @@ class BuildTests(unittest.TestCase):
             self.memories()
 
     def test_missing_page_is_rejected(self):
-        self.image("comics/001_空.webp")
-        self.image("comics/001-3_空.webp")
+        self.image("memories/20261125_空.webp")
+        self.image("memories/20261125-3_空.webp")
         with self.assertRaisesRegex(builder.BuildError, "欠番なく"):
-            self.stories()
+            self.memories()
 
     def test_title_punctuation_is_preserved(self):
         self.image("comics/001_ここくも、みつかる # 100%.webp")
         self.assertEqual(self.stories()[0]["title"], "ここくも、みつかる # 100%")
 
     def test_build_creates_data_and_old_image_url_without_changing_bytes(self):
-        original = self.image("comics/001/001_ここくも、みつかる.webp")
+        original = self.image("comics/001_ここくも、みつかる.webp")
         output = self.root / "_site"
         builder.build(self.root, output)
         records = json.loads((output / "data/comics.json").read_text(encoding="utf-8"))
         self.assertEqual(records[0]["id"], "001")
         self.assertEqual(records[0]["title"], "ここくも、みつかる")
+        self.assertEqual(records[0]["images"], ["comics/001_ここくも、みつかる.webp"])
         self.assertEqual((output / "comics/001/001-1.webp").read_bytes(), original.read_bytes())
+        self.assertEqual((output / "comics/001/001_ここくも、みつかる.webp").read_bytes(), original.read_bytes())
         self.assertEqual(json.loads((output / "data/memories.json").read_text()), [])
         self.assertFalse((self.root / "data/comics.json").exists())
         # Rebuild deterministically; deleted sources must disappear from output.

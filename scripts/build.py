@@ -36,11 +36,15 @@ def collect(source, config):
             raise BuildError(f"{relative}: シンボリックリンクではなく実際の画像を保存してください。")
         if not path.is_file() or path.suffix.lower() not in IMAGE_EXTENSIONS:
             continue
+        if config["kind"] == "number" and path.parent != folder:
+            raise BuildError(f"{relative}: おはなしの画像は話数フォルダを作らず、comics直下に置いてください。例: comics/001_タイトル.webp")
         match = pattern.fullmatch(path.name)
         example = "001_タイトル.webp" if config["kind"] == "number" else "20261125_タイトル.webp"
         if not match:
-            raise BuildError(f"{relative}: ファイル名の形式が違います。例: {example}（複数ページは番号-2_タイトル.webp）")
+            raise BuildError(f"{relative}: ファイル名の形式が違います。例: {example}")
         key, page_text, raw_title = match.groups()
+        if config["kind"] == "number" and page_text is not None:
+            raise BuildError(f"{relative}: おはなしは1話につき1枚です。枝番を付けず、001_タイトル.webp の形式にしてください。")
         title = unicodedata.normalize("NFC", raw_title)
         if not title.strip() or title != title.strip() or any(unicodedata.category(c).startswith("C") or c == "\\" for c in title):
             raise BuildError(f"{relative}: タイトルの前後の空白・改行・制御文字を取り除いてください。")
@@ -59,7 +63,7 @@ def collect(source, config):
             metadata = {"date": event_date.isoformat()}
         group = groups.setdefault(identity, {"id": identity, "title": title, **metadata, "pages": {}})
         if group["title"] != title:
-            raise BuildError(f'{relative}: 作品番号{key}が別のタイトル「{group["title"]}」と重複しています。番号を分けるか、同じ話のタイトルをそろえてください。')
+            raise BuildError(f'{relative}: 作品番号{key}が別のタイトル「{group["title"]}」と重複しています。おはなしは1話につき1枚とし、作品番号を確認してください。')
         if page in group["pages"]:
             raise BuildError(f'{relative}: {config["label"]}「{title}」の{page}ページ目が重複しています: {group["pages"][page]}')
         group["pages"][page] = relative
@@ -102,6 +106,9 @@ def build(source, output):
                         alias = stage / "comics" / record["number"] / f'{record["number"]}-{page}.webp'
                         alias.parent.mkdir(parents=True, exist_ok=True)
                         shutil.copy2(source / relative, alias)
+                        # Also preserve the filename-based URL used before flattening comics/.
+                        named_alias = alias.parent / Path(relative).name
+                        shutil.copy2(source / relative, named_alias)
         (stage / ".nojekyll").touch()
         if output.exists():
             shutil.rmtree(output)
